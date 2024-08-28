@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2023, RT-Thread Development Team
+ * Copyright (c) 2006-2024, RT-Thread Development Team
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -8,8 +8,8 @@
  * 2023-11-23     WangShun     the first version
  */
 
-#include "rvbacktrace.h"
-#if defined(CONFIG_KERNEL_RTTHREAD)
+#include "../include/rvbacktrace.h"
+
 extern char *__etext;
 extern char *__stext;
 
@@ -273,4 +273,3 @@ int rv_backtrace_fomit(int (*print_func)(const char *fmt, ...))
     print_func("==========    End     ==========\r\n");
     return lvl;
 }
-#endif/* CONFIG_KERNEL_RTTHREAD */

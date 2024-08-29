@@ -1,7 +1,11 @@
 import os  
   
-# 设定obj文件夹的路径  
-obj_folder_path = os.path.join(os.getcwd(), 'obj')  
+# 获取当前脚本文件所在路径  
+current_script_path = os.path.abspath(__file__)  
+current_script_dir = os.path.dirname(current_script_path)  
+  
+# 设定obj文件夹的路径，基于当前脚本所在目录  
+obj_folder_path = os.path.join(current_script_dir, 'obj')  
   
 # path.txt文件的完整路径  
 path_txt_file = os.path.join(obj_folder_path, 'path.txt')  
@@ -44,14 +48,15 @@ if not asm_path_found:
             if os.path.getsize(path_txt_file) > 0:  # 如果文件不为空，则添加换行符  
                 file.write('\n')  
             for file_path in assembly_files:  
+                # 保存每个汇编文件的完整路径  
                 file.write(f"asm_path = '{file_path}'\n")  
-        print(f"汇编文件的绝对路径已保存到: {path_txt_file}")  
+        print(f"汇编文件的完整路径已保存到: {path_txt_file}")  
     else:  
         print("在指定目录下未找到汇编文件。")  
 else:  
-    print("path.txt文件已存在且包含asm_path字段，无需重新输入目录。")  
+    print("path.txt文件已存在且包含asm_path字段，无需重新输入目录。") 
   
-# 处理info_path  
+# 处理info_path（逻辑与asm_path类似，但这里保留列出所有文件的逻辑）  
 info_path_found = 'info_path' in existing_paths  
 if not info_path_found:  
     directory_path = input("请输入包含串口打印文件的目录路径: ")  

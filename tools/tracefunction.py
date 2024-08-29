@@ -3,7 +3,7 @@ import re
 
 current_dir = os.path.dirname(os.path.abspath(__file__))  
 path_txt_path = os.path.join(current_dir, 'obj', 'path.txt')  
-  
+print(path_txt_path) 
 if os.path.exists(path_txt_path):
     with open(path_txt_path, 'r', encoding='utf-8') as path_file: 
         for line in path_file:
@@ -19,15 +19,16 @@ if os.path.exists(path_txt_path):
 if not os.path.exists(directory) or not os.path.isdir(directory):  
     print("指定的路径不存在或不是一个目录。")  
     exit()  
-  
+
 # 栈帧计数器  
 frame_number = 0  
   
 # 输出文件的完整路径  
-output_dir = 'obj'  
-if not os.path.exists(output_dir):  
-    os.makedirs(output_dir)  # 如果文件夹不存在，则创建它  
-output_file_path = os.path.join(output_dir, 'function_pc.txt')  
+output_file_path = os.path.join(current_dir, 'obj', 'function_pc.txt')  
+# output_dir = 'obj'  
+# if not os.path.exists(output_dir):  
+#     os.makedirs(output_dir)  # 如果文件夹不存在，则创建它  
+# output_file_path = os.path.join(output_dir, 'function_pc.txt')  
   
 # 尝试打开（或创建）输出文件  
 with open(output_file_path, 'w', encoding='utf-8') as output_file:  

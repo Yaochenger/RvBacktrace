@@ -9,6 +9,19 @@ def extract_hex_from_file(file_path):
             if line.strip().startswith('0x'):  
                 hex_values.append(line.strip()[2:])  # 去除'0x'并保留整个十六进制数  
     return hex_values  
+
+def read_asm_path_from_file(path_txt_file):  
+    """从path.txt文件中读取asm_path字段的值"""  
+    asm_path = None  
+    with open(path_txt_file, 'r', encoding='utf-8') as file:  
+        for line in file:  
+            if line.strip().startswith('asm_path = '):  
+                # 假设路径是被单引号或双引号包围的  
+                match = re.match(r'asm_path = ([\'"])(.*?)\1', line.strip())  
+                if match:  
+                    asm_path = match.group(2)  
+                    break  
+    return asm_path  
   
 def find_matches_in_asm(asm_path, hex_values, output_dir='obj'):  
     """在ASM文件中查找与给定十六进制数值列表中的每个值相等的行，  
@@ -45,21 +58,29 @@ def find_matches_in_asm(asm_path, hex_values, output_dir='obj'):
 def main():  
     # 获取当前工作目录  
     current_dir = os.getcwd()  
-    # 假设obj文件夹在当前工作目录的下一级目录中  
+    # 构建obj文件夹的路径  
     obj_dir = os.path.join(current_dir, 'obj')  
-    # 构建function_pc.txt的完整路径  
-    stackpc_path = os.path.join(obj_dir, 'function_pc.txt')  
-    # 保持asm_path不变（如果你确定它的位置是正确的）  
-    asm_path = 'E:\\RvBacktrace\\tools\\asm\\rtthread.asm'  
+    # 构建path.txt的完整路径  
+    path_txt_file = os.path.join(obj_dir, 'path.txt')  
       
-    # function_pc.txt中提取所有十六进制数  
-    hex_values = extract_hex_from_file(stackpc_path)  
+    # 从path.txt文件中读取asm_path  
+    asm_path = read_asm_path_from_file(path_txt_file)  
+    
+    if not asm_path:  
+        print("无法在path.txt文件中找到asm_path字段。")  
+        return  
+      
+    # 假设function_pc.txt也位于obj文件夹中  
+    function_pc_path = os.path.join(obj_dir, 'function_pc.txt')  
+      
+    # 从function_pc.txt中提取所有十六进制数  
+    hex_values = extract_hex_from_file(function_pc_path)  
       
     # 检查是否成功提取到数据  
     if not hex_values:  
         print("function_pc.txt中没有找到以0x开头的有效十六进制数。")  
     else:  
-        # 在rtthread.asm中查找匹配的行并按stackpc.txt中的顺序输出  
+        # 在rtthread.asm中查找匹配的行并按function_pc.txt中的顺序输出  
         find_matches_in_asm(asm_path, hex_values)  
   
 if __name__ == "__main__":  

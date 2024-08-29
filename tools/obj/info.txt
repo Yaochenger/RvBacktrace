@@ -1,5 +1,0 @@
-8000ff24:	f61ff0ef          	jal	ra,8000fe84 <walk_stackframe>
-8000fe7a:	2049                	jal	8000fefc <rv_backtrace_fno>
-8000fffe:	e75ff0ef          	jal	ra,8000fe72 <rvbacktrace>
-8000688a:	738090ef          	jal	ra,8000ffc2 <main>
- 1086a7a:	8082                	ret

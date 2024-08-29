@@ -1,10 +1,20 @@
 import os  
 import re  
+
+current_dir = os.path.dirname(os.path.abspath(__file__))  
+path_txt_path = os.path.join(current_dir, 'obj', 'path.txt')  
   
-# 用户输入目录路径  
-directory_input = input("请输入txt文件的目录路径（例如：E:\\RvBacktrace\\tools\\txt）: ")  
-directory = os.path.abspath(directory_input)  
-  
+if os.path.exists(path_txt_path):
+    with open(path_txt_path, 'r', encoding='utf-8') as path_file: 
+        for line in path_file:
+            if line.strip().startswith('info_path ='):  
+                info_path_raw = line.split('=')[-1].strip().strip('"').strip("'")  
+                # 将info_path转换为绝对路径（如果它不是的话）  
+                info_path_abs = os.path.abspath(info_path_raw)  
+                # 去除文件名部分，只保留目录路径  
+                info_dir_path = os.path.dirname(info_path_abs)  
+                directory = info_dir_path  
+                
 # 确保路径存在且为目录  
 if not os.path.exists(directory) or not os.path.isdir(directory):  
     print("指定的路径不存在或不是一个目录。")  

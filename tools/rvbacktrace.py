@@ -13,11 +13,14 @@ if not os.path.exists(directory) or not os.path.isdir(directory):
 # 栈帧计数器  
 frame_number = 0  
   
-# 写入结果的文件名  
-output_filename = 'stackpc.txt'  
+# 输出文件的完整路径  
+output_dir = 'obj'  
+if not os.path.exists(output_dir):  
+    os.makedirs(output_dir)  # 如果文件夹不存在，则创建它  
+output_file_path = os.path.join(output_dir, 'function_pc.txt')  
   
 # 尝试打开（或创建）输出文件  
-with open(output_filename, 'w', encoding='utf-8') as output_file:  
+with open(output_file_path, 'w', encoding='utf-8') as output_file:  
     # 遍历目录下的所有.txt文件  
     for filename in os.listdir(directory):  
         if filename.endswith('.txt'):  
@@ -33,8 +36,9 @@ with open(output_filename, 'w', encoding='utf-8') as output_file:
                             if hex_match:  
                                 # 提取十六进制数据部分  
                                 hex_data = hex_match.group(0).split(' ', 1)[-1].strip()  
-                                # 去除前导空格和非十六进制字符（仅保留"0x"及其后的内容）  
-                                hex_data = re.search(r'\b0x[0-9a-fA-F]+\b', hex_data).group(0)  
+                                # 去除前导空格和非十六进制字符（这里其实已经由上一个正则保证了）  
+                                # 但为了清晰，保留这一行，实际上可能不需要再次搜索  
+                                # hex_data = re.search(r'\b0x[0-9a-fA-F]+\b', hex_data).group(0)  
                                 # 打印栈帧级别和栈帧地址（可选，用于控制台输出）  
                                 print(f"第{frame_number + 1}级栈帧，栈帧地址: {hex_data}")  
                                 # 将栈帧地址写入输出文件  
@@ -46,4 +50,4 @@ with open(output_filename, 'w', encoding='utf-8') as output_file:
                 print(f"无法读取文件 {file_path}: {e}")  
   
 # 程序执行完毕  
-print("所有txt文件中的栈帧地址已写入 stackpc.txt 文件。")
+print("所有txt文件中的栈帧地址已写入当前路径下obj文件夹的function_pc.txt文件。")

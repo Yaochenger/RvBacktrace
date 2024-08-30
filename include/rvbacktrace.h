@@ -8,6 +8,8 @@
 
 // user define
 #define BACKTRACE_USE_FP
+#define STACK_FRAME_LEN (10)
+#define STACK_BUFFER_LEN (100)
 
 // system define
 #if __riscv_xlen == 32
@@ -31,5 +33,6 @@ struct stackframe
 void rvbacktrace(void); // backtrace function for usr
 void rv_backtrace_fno(void);
 int rv_backtrace_fomit(int (*print_func)(const char *fmt, ...));
+void rvbacktrace_addr2line(rt_uint32_t *frame);
 
 #endif /* RV_BACKTRANCE_H */

@@ -32,9 +32,9 @@ existing_paths = check_and_get_existing_paths(path_txt_file)
 # 处理asm_path  
 asm_path_found = 'asm_path' in existing_paths  
 if not asm_path_found:  
-    directory_path = input("请输入包含汇编文件的目录路径: ")  
+    directory_path = input("[RV] 请输入包含汇编文件的目录路径: ")  
     if not os.path.isdir(directory_path):  
-        print("错误：输入的不是一个有效的目录。")  
+        print("[RV] 错误：输入的不是一个有效的目录。")  
         exit()  
   
     assembly_files = []  
@@ -50,16 +50,16 @@ if not asm_path_found:
             for file_path in assembly_files:  
                 # 保存每个汇编文件的完整路径  
                 file.write(f"asm_path = '{file_path}'\n")  
-        print(f"汇编文件的完整路径已保存到: {path_txt_file}")  
+        print(f"[RV] 汇编文件的完整路径已保存到: {path_txt_file}")  
     else:  
-        print("在指定目录下未找到汇编文件。")  
+        print("[RV] 在指定目录下未找到汇编文件。")  
 else:  
-    print("path.txt文件已存在且包含asm_path字段，无需重新输入目录。") 
+    print("[RV] 路径文件path.txt已存在且包含asm_path字段，无需重新输入目录。") 
   
 # 处理info_path（逻辑与asm_path类似，但这里保留列出所有文件的逻辑）  
 info_path_found = 'info_path' in existing_paths  
 if not info_path_found:  
-    directory_path = input("请输入包含串口打印文件的目录路径: ")  
+    directory_path = input("[RV] 请输入包含串口打印文件的目录路径: ")  
     if not os.path.isdir(directory_path):  
         print("错误：输入的不是一个有效的目录。")  
         exit()  
@@ -76,8 +76,8 @@ if not info_path_found:
                 file.write('\n')  
             for file_path in info_files:  
                 file.write(f"info_path = '{file_path}'\n")  
-        print(f"串口打印文件的绝对路径已保存到: {path_txt_file}")  
+        print(f"[RV] 串口打印文件的绝对路径已保存到: {path_txt_file}")  
     else:  
         print("在指定目录下未找到串口打印文件。")  
 else:  
-    print("path.txt文件已存在且包含info_path字段，无需重新输入目录。")
+    print("[RV] 路径文件path.txt已存在且包含info_path字段，无需重新输入目录。")

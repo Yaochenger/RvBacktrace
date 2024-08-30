@@ -19,17 +19,12 @@ def generate_html_table(input_file_relative, output_filename):
       
     table_data = []  
     for line in lines: 
-        print(11) 
         match = re.match(r'\s*([0-9a-fA-F]+):\s+([0-9a-fA-F]+)\s+(.*?)<([^>]+)>', line) 
         if match:  
-            address = match.group(1).strip()
-            print(address)  
-            instruction = match.group(2).strip()
-            print(instruction)   
+            address = match.group(1).strip() 
+            instruction = match.group(2).strip() 
             asm = match.group(3).strip() 
-            print(asm)   
-            function_name = match.group(4).strip()
-            print(function_name)   
+            function_name = match.group(4).strip() 
             table_data.append((address, instruction, asm, function_name))  
       
     # 构建函数调用栈字符串  

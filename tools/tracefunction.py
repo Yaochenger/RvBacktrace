@@ -3,7 +3,7 @@ import re
 
 current_dir = os.path.dirname(os.path.abspath(__file__))  
 path_txt_path = os.path.join(current_dir, 'obj', 'path.txt')  
-print(path_txt_path) 
+ 
 if os.path.exists(path_txt_path):
     with open(path_txt_path, 'r', encoding='utf-8') as path_file: 
         for line in path_file:
@@ -51,7 +51,7 @@ with open(output_file_path, 'w', encoding='utf-8') as output_file:
                                 # 但为了清晰，保留这一行，实际上可能不需要再次搜索  
                                 # hex_data = re.search(r'\b0x[0-9a-fA-F]+\b', hex_data).group(0)  
                                 # 打印栈帧级别和栈帧地址（可选，用于控制台输出）  
-                                print(f"第{frame_number + 1}级栈帧，栈帧地址: {hex_data}")  
+                                print(f"[RV] 第{frame_number + 1}级栈帧，栈帧地址: {hex_data}")  
                                 # 将栈帧地址写入输出文件  
                                 output_file.write(hex_data + '\n')  
                                 # 更新栈帧计数器  
@@ -59,6 +59,3 @@ with open(output_file_path, 'w', encoding='utf-8') as output_file:
   
             except Exception as e:  
                 print(f"无法读取文件 {file_path}: {e}")  
-  
-# 程序执行完毕  
-print("所有txt文件中的栈帧地址已写入当前路径下obj文件夹的function_pc.txt文件。")

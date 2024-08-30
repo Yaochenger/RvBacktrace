@@ -1,33 +1,84 @@
 import subprocess  
 import os  
+import time  
   
-# 定义tools目录的路径（相对于当前脚本）  
-tools_dir = './tools'  
+def check_file_modified(file_path, last_modified_time):  
+    """检查文件是否自上次检查后被修改过"""  
+    if not os.path.exists(file_path):  
+        return False  # 如果文件不存在，则认为没有被修改  
+    current_modified_time = os.path.getmtime(file_path)  
+    return current_modified_time != last_modified_time  
   
-# 构造html目录的路径  
-html_dir = os.path.join(tools_dir, 'html')  
+def read_info_path_from_file(file_path):  
+    """从文件中读取info_path字段的值，并尝试将其转换为绝对路径（如果可能）"""  
+    try:  
+        with open(file_path, 'r') as file:  
+            for line in file:  
+                if line.startswith('info_path ='):  
+                    value = line.split('=', 1)[1].strip()  
+                    # 去除字符串两端的引号（如果有）  
+                    cleaned_value = value.strip("'\"")  
+                    # 尝试将路径转换为绝对路径（如果它是相对路径）  
+                    return os.path.abspath(cleaned_value) if not os.path.isabs(cleaned_value) else cleaned_value  
+        return None  # 如果没有找到info_path，则返回None  
+    except FileNotFoundError:  
+        print(f"文件 {file_path} 未找到。")  
+        return None  
   
-# 假设html目录下有一个名为index.html的文件  
-html_file = os.path.join(html_dir, 'rvbacktrace.html')  
+def execute_scripts(tools_dir):  
+    """执行指定目录下的脚本"""  
+    scripts = ['tracepath.py', 'tracefunction.py', 'traceinfo.py', 'tracehtml.py']  
+    for script in scripts:  
+        full_path = os.path.join(tools_dir, script)  
+        subprocess.run(['python', full_path], check=True)  
   
-# 确保html目录存在，如果脚本需要创建该目录或文件，可以在这里添加逻辑  
-# 例如：os.makedirs(html_dir, exist_ok=True)  
+def open_html_file(html_file):  
+    """尝试在默认浏览器中打开HTML文件"""  
+    try:  
+        subprocess.run(['start', html_file], shell=True, check=True)  
+    except subprocess.CalledProcessError:  
+        print(f"Failed to open {html_file} with the default browser.")  
   
-# 定义要执行的脚本列表  
-scripts = ['tracepath.py', 'tracefunction.py', 'traceinfo.py', 'tracehtml.py']  
+def main():  
+    script_dir = os.path.dirname(os.path.abspath(__file__))  # 获取当前脚本的目录  
+    tools_dir = os.path.join(script_dir, 'tools')  
+    html_dir = os.path.join(tools_dir, 'html')  
+    html_file = os.path.join(html_dir, 'rvbacktrace.html')  
   
-# 遍历脚本列表，并调用它们  
-for script in scripts:  
-    full_path = os.path.join(tools_dir, script)  
-    subprocess.run(['python', full_path], check=True)  
+    # 确保html目录存在  
+    os.makedirs(html_dir, exist_ok=True)  
   
-# 尝试在Windows上打开HTML文件  
-# 使用start命令，并设置shell=True来在shell中执行它  
-try:  
-    subprocess.run(['start', html_file], shell=True, check=True)  
-except subprocess.CalledProcessError:  
-    # 如果start命令失败（虽然这种情况很少见，除非文件不存在或没有关联的浏览器）  
-    print(f"Failed to open {html_file} with the default browser.")  
+    # 执行脚本  
+    execute_scripts(tools_dir)  
   
-# 注意：使用shell=True时要非常小心，因为它可能会使你的代码容易受到shell注入攻击  
-# 如果可能的话，最好避免使用shell=True，但在这种情况下，它是打开文件的必要方式
+    # 尝试打开HTML文件  
+    open_html_file(html_file)  
+  
+    # 读取info_path并监控文件更改  
+    path_txt_file = os.path.join(script_dir, 'tools', 'obj', 'path.txt')  
+    info_path = read_info_path_from_file(path_txt_file) 
+    print("\n[RV] 修改栈回溯信息文本后，脚本将自动重新生成栈回溯HTML文件。")  
+    print("--输入Ctrl+C退出脚本--\n") 
+    if info_path:  
+        last_modified_time = os.path.getmtime(info_path)  
+  
+        while True:  
+            time.sleep(1)  # 每秒检查一次  
+  
+            if check_file_modified(info_path, last_modified_time):  
+                print(f"[RV] 栈回溯文件 {info_path} 已被修改。")  
+                last_modified_time = os.path.getmtime(info_path)  
+                print("[RV] 重新生成栈回溯HTML文件...")  
+                main()  # 递归调用main()，但请注意潜在的堆栈溢出  
+                break  # 如果不希望无限递归，可以在检测到更改后退出循环（但这将停止监控）  
+  
+    else:  
+        print("无法从文件中读取info_path或文件不存在。")  
+  
+if __name__ == "__main__":  
+    try:  
+        main()  
+    except RecursionError:  
+        print("发生递归错误，可能是由于文件被频繁修改导致的无限递归调用。")  
+    except Exception as e:  
+        print(f"发生错误：{e}")

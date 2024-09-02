@@ -1,8 +1,4 @@
 /*
- * Copyright (c) 2006-2024, RT-Thread Development Team
- *
- * SPDX-License-Identifier: Apache-2.0
- *
  * Change Logs:
  * Date           Author       Notes
  * 2023-11-23     WangShun     the first version

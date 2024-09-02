@@ -6,7 +6,7 @@
  * Change Logs:
  * Date           Author       Notes
  * 2023-11-23     WangShun     the first version
- * 2024-08-30     WangShun     add addr2line function 
+ * 2024-08-30     WangShun     add addr2line function
  */
 
 #include "../include/rvbacktrace.h"

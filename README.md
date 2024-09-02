@@ -15,6 +15,8 @@ void rvbacktrace(void);
 
 ## 使用示例
 
+论坛使用说明：https://club.rt-thread.org/ask/article/64bfe06feb7b3e29.html
+
 注意事项：组件支持基于FP的栈回溯与非FP的栈回溯，当前默认使用基于FP的栈回溯的方式（软件暂时只支持玄铁C906,908系列），在使用时需要在汇编与C/C++的编译选项下添加编译选项（确保编译器使用fp/s0寄存器保存栈帧）：-fno-omit-frame-pointer；
 
 这里展示在RT-Thread 支持的HPM6750 BSP下使用该组件。

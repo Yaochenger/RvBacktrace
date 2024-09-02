@@ -6,7 +6,7 @@
  * Change Logs:
  * Date           Author       Notes
  * 2023-11-21     WangShun     the first version
- * 2024-08-30     WangShun     add addr2line function 
+ * 2024-08-30     WangShun     add addr2line function
  */
 
 #include "../include/rvbacktrace.h"
@@ -59,6 +59,6 @@ void rv_backtrace_fno(void)
     rt_kprintf("###Please consider the value of ra as accurate and the value of sp as only for reference###\n");
     walk_stackframe();
     rt_kprintf("---- RV_Backtrace Call Frame End:----\r\n");
-    rvbacktrace_addr2line();
+    rvbacktrace_addr2line((rt_uint32_t *)&rvstack_frame[0]); // addr2line function
     rt_kprintf("\r\n");
 }

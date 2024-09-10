@@ -6,10 +6,14 @@
 #include <stdint.h>
 #include "rtthread.h"
 
-// user define
+// user configure
 #define BACKTRACE_USE_FP
+#define BACKTRACE_ALL_THREAD // Outputs the stack of all threads
+
+// user parameter
 #define STACK_FRAME_LEN (10)
 #define STACK_BUFFER_LEN (100)
+#define BACKTRACE_FP_POS (8)
 
 // system define
 #if __riscv_xlen == 32

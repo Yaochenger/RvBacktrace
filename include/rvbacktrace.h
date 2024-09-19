@@ -1,21 +1,30 @@
 #ifndef RV_BACKTRANCE_H
 #define RV_BACKTRANCE_H
 
-// system include
 #include <stdio.h>
 #include <stdint.h>
 #include "rtthread.h"
 
-// user configure
-#define BACKTRACE_USE_FP
-#define BACKTRACE_ALL_THREAD // Outputs the stack of all threads
+/* User Configure */
+// #define BACKTRACE_USE_FP // To enable this option, add the [-fno-omit-frame-pointer] option to ASM,C/C++.
+// #define BACKTRACE_ALL    // Before enabling this option, enable the BACKTRACE_USE_FP / Outputs the stack of all threads
+#define BACKTRACE_PRINTF rt_kprintf // Printf function to print stack back information
 
-// user parameter
+/* Backtrace All Threads */
+#if defined(BACKTRACE_USE_FP) && defined(BACKTRACE_ALL)
+#define BACKTRACE_ALL_THREAD
+#define BACKTRACE_FP_POS (8)
+#endif /* BACKTRACE_USE_FP && defined BACKTRACE_ALL */
+
+/* Backtrace Printf */
+#if !defined(BACKTRACE_PRINTF)
+#define BACKTRACE_PRINTF printf
+#endif /* BACKTRACE_PRINTF */
+
+/* User Parameter */
 #define STACK_FRAME_LEN (10)
 #define STACK_BUFFER_LEN (100)
-#define BACKTRACE_FP_POS (8)
 
-// system define
 #if __riscv_xlen == 32
 #define BACKTRACE_LEN 8
 #endif
@@ -35,8 +44,8 @@ struct stackframe
 };
 
 void rvbacktrace(void); // backtrace function for usr
-void rv_backtrace_fno(void);
-int rv_backtrace_fomit(int (*print_func)(const char *fmt, ...));
-void rvbacktrace_addr2line(rt_uint32_t *frame);
+void rvbacktrace_fno(int (*print_func)(const char *fmt, ...));
+int rvbacktrace_fomit(int (*print_func)(const char *fmt, ...));
+void rvbacktrace_addr2line(rt_uint32_t *frame, int (*print_func)(const char *fmt, ...));
 
 #endif /* RV_BACKTRANCE_H */

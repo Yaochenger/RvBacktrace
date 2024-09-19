@@ -2,12 +2,20 @@
  * Change Logs:
  * Date           Author       Notes
  * 2023-11-23     WangShun     the first version
+ * 2024-09-19     WangShun     support rv32
  */
 
 #include "../include/rvbacktrace.h"
 
+/* Please check that the following symbols are defined in the linked scripts ！*/ 
+/* If not, define the following symbols at the beginning and end of the text segment */
 extern char *__etext;
 extern char *__stext;
+
+extern unsigned int rvstack_frame[STACK_FRAME_LEN]; // stack frame
+extern unsigned int rvstack_frame_len; // stack frame len
+
+static int lvl;
 
 #define BT_CHK_PC_AVAIL(pc)   ((uintptr_t)(pc) < (uintptr_t)(&__etext) \
                               && (uintptr_t)(pc) > (uintptr_t)(&__stext))
@@ -58,8 +66,8 @@ static int riscv_backtrace_framesize_get(unsigned short inst)
 static int riscv_backtrace_ra_offset_get1(unsigned int inst)
 {
     unsigned int imm = 0;
-    /* sd ra,552(sp) */
-    if ((inst & 0x81FFF07F) == 0x113023) {
+    /* sw ra,552(sp) */
+    if ((inst & 0x81FFF07F) == 0x112023) {
         imm = (inst >> 7) & 0x1F;
         imm |= ((inst >> 25) & 0x7F) << 5;
         /* The unit is size_t, So we don't have to move 3 bits to the left */
@@ -114,7 +122,6 @@ static int backtraceFindLROffset(char *LR, int (*print_func)(const char *fmt, ..
     int offset = 0;
     char *LR_indeed;
     unsigned int ins32;
-    char         s_panic_call[] = "backtrace : 0x         \r\n";
 
     LR_indeed = BT_PC2ADDR(LR);
 
@@ -124,11 +131,6 @@ static int backtraceFindLROffset(char *LR, int (*print_func)(const char *fmt, ..
         offset = 4;
     } else {
         offset = 2;
-    }
-
-    if (print_func != NULL) {
-        k_int64tostr((int)((unsigned long)LR_indeed - offset), &s_panic_call[14]);
-        print_func(s_panic_call);
     }
 
     return offset;
@@ -212,6 +214,10 @@ static int riscv_backtraceFromStack(long **pSP, char **pPC,
     }
     *pSP   = SP + framesize;
     offset = backtraceFindLROffset(LR, print_func);
+
+    rvstack_frame[lvl] = (unsigned int)(LR - offset);
+
+    print_func("[%d]Stack interval :[0x%016lx - 0x%016lx]  ra 0x%016lx pc 0x%016lx\n", lvl, SP, SP + framesize, LR, LR - offset);
     *pPC   = LR - offset;
 
     return offset == 0 ? 1 : 0;
@@ -245,11 +251,10 @@ __attribute__((always_inline)) static inline void *backtrace_get_pc(void)
 
 /* printf call stack
    return levels of call stack */
-int rv_backtrace_fomit(int (*print_func)(const char *fmt, ...))
+int rvbacktrace_fomit(int (*print_func)(const char *fmt, ...))
 {
     char *PC;
     long  *SP;
-    int   lvl;
     int   ret;
 
     if (print_func == NULL) {
@@ -259,13 +264,18 @@ int rv_backtrace_fomit(int (*print_func)(const char *fmt, ...))
     SP = backtrace_get_sp();
     PC = backtrace_get_pc();
 
-    print_func("========== Call stack ==========\r\n");
+    print_func("\r\n---- RV_Backtrace Call Frame Start: ----\r\n");
+    print_func("###Please consider the value of ra as accurate and the value of sp as only for reference###\n");
+    print_func("------------------------------Thread: %s backtrace------------------------------\r\n", ((rt_thread_t)rt_thread_self())->parent.name);
     for (lvl = 0; lvl < BT_LVL_LIMIT; lvl++) {
         ret = backtraceFromStack(&SP, &PC, print_func);
         if (ret != 0) {
+            rvstack_frame_len = lvl;
             break;
         }
     }
-    print_func("==========    End     ==========\r\n");
+    rvbacktrace_addr2line((rt_uint32_t *)&rvstack_frame[0], print_func);
+    print_func("---- RV_Backtrace Call Frame End:----\r\n");
+    print_func("\r\n");
     return lvl;
 }

@@ -16,9 +16,9 @@ void rvbacktrace(void);
 
 ## 组件配置
 
-组件支持两种方式栈回溯。
+组件支持两种方式栈回溯，当前默认使用配置简单的方式一，使用方式二请看下文的使用示例。
 
-方式一：不添加编译参数，通过调用栈结构进行栈回溯。
+方式一：不添加编译参数，通过调用栈结构与指令类型进行栈回溯。
 
 优点：不额外占用系统寄存器  缺点：增加代码空间，效率较方式一较低
 
@@ -37,7 +37,7 @@ extern char *__etext;
 extern char *__stext;
 ```
 
-若不存在，在连接脚本中添加，__ etext位于代码段的开始，__stext位于代码段的末尾，链接脚本中的示例添加位置：
+若不存在，请在链接脚本中添加上述符号，__ etext位于代码段的开始，__stext位于代码段的末尾，以下是在链接脚本中添加上述符号的示例位置：
 
 ```stylus
 	PROVIDE (__stext = .);
@@ -149,7 +149,11 @@ addr2line -e rtthread.elf -a -f 8000d110 8000cfb6 80010956 1086a78
 addr2line -e rtthread.elf -a -f 8000d110 8000cfb6 80010956 1086a78
 ```
 
-方式二支持对当前系统所有的线程进行栈回溯，在rvacktrace.h中定义BACKTRACE_ALL
+执行上述命令的示例结果如下图所示：
+
+![](figures/2.png)
+
+方式二支持对当前系统所有的线程进行栈回溯，在rvacktrace.h中定义BACKTRACE_ALL即可输出当前系统各线程的调用栈。
 
 ```stylus
 #define BACKTRACE_ALL 

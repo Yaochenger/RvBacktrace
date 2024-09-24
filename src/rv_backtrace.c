@@ -37,3 +37,15 @@ void rvbacktrace_addr2line(rt_uint32_t *frame, int (*print_func)(const char *fmt
     }
     print_func("\naddr2line -e rtthread.elf -a -f %s\n", buffer); 
 }
+
+#if defined (BACKTRACE_FSTACK_PROTECT)
+__attribute__ ((noreturn)) void __wrap__exit(int status)
+{
+    extern void rvbacktrace(void);
+    extern void __rt_libc_exit(int status);
+    rvbacktrace();
+    __rt_libc_exit(status);
+    while (1);
+}
+#endif /* BACKTRACE_FSTACK_PROTECT */
+

@@ -8,6 +8,7 @@
 /* User Configure */
 // #define BACKTRACE_USE_FP // To enable this option, add the [-fno-omit-frame-pointer] option to ASM,C/C++.
 // #define BACKTRACE_ALL    // Before enabling this option, enable the BACKTRACE_USE_FP / Outputs the stack of all threads
+// #define BACKTRACE_FSTACK_PROTECT // To enable this option, add the [-fstack-protector-strong] option to ASM,C/C++, add [-Wl,--wrap,_exit] flag to link option.
 #define BACKTRACE_PRINTF rt_kprintf // Printf function to print stack back information
 
 /* Backtrace All Threads */

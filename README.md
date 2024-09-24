@@ -6,6 +6,17 @@
 
 RVBacktrace是一个极简的RISC-V栈回溯组件。用于断言或异常等情况下的辅助调试。
 
+## 组件功能
+
+### 基础功能
+
+1. 从调用位置栈回溯(支持支持FP模式栈回溯/软件栈回溯)
+2. 命令查看当前`RT-Thread`系统所有线程的调用栈（依赖RT-Thread/仅支持FP模式栈回溯）
+
+### 进阶功能
+
+1. 定位栈溢出位置，从溢出位置进行栈回溯，(需要结合gcc的-fstack-protector-strong参数/须同时开启FP模式栈回溯)
+
 ## API介绍
 
 RVBacktrace组件仅包含一个面向用户的API，用户在需要的地方调用该函数可以进行从当前位置进行栈回溯，用户可将该API对接到断言函数或者在异常中调用，辅助调试。
@@ -207,6 +218,53 @@ Thread Total Num: 5
 ```
 
 该模式用于tshell线程可以正常执行时打印输出当前系统所有线程的调用栈，用于辅助分析死锁，线程异常挂起等现象
+
+## 进阶功能示例
+
+### 1.栈溢出检测
+
+在rvbacktrace.h文件中定义下述宏：
+
+```stylus
+#define BACKTRACE_USE_FP
+#define BACKTRACE_FSTACK_PROTECT
+```
+
+在C/C++并编译参数中添加`-fstack-protector-strong`,在连接参数中添加`-Wl,--wrap,_exit`，最后添加下述示例代码编译运行
+
+```stylus
+int main(void)
+{
+    char array[5] = {0};
+    rt_strcpy(array, "stack leak test");
+    
+    return 0;
+}
+```
+
+运行结果：
+
+```stylus
+*** stack smashing detected ***: terminated
+
+---- RV_Backtrace Call Frame Start: ----
+###Please consider the value of ra as accurate and the value of sp as only for reference###
+------------------------------Thread: main backtrace------------------------------
+Current Thread Name:  main
+[0]Stack interval :[0x000000000108ef38 - 0x000000000108ef48]  ra 0x000000008000d450 pc 0x000000008000d44c
+[1]Stack interval :[0x000000000108ef48 - 0x000000000108ef58]  ra 0x000000008000d2bc pc 0x000000008000d2b8
+[2]Stack interval :[0x000000000108ef58 - 0x000000000108ef68]  ra 0x000000008000d368 pc 0x000000008000d364
+[3]Stack interval :[0x000000000108ef68 - 0x000000000108efc8]  ra 0x0000000080012224 pc 0x0000000080012220
+[4]Stack interval :[0x000000000108efc8 - 0x000000000108efd8]  ra 0x0000000080006890 pc 0x000000008000688c
+[5]Stack interval :[0x000000000108efd8 - 0x00000000deadbeef]  ra 0x0000000001086bc4 pc 0x0000000001086bc0
+
+addr2line -e rtthread.elf -a -f 8000d44c 8000d2b8 8000d364 80012220 8000688c 1086bc0
+---- RV_Backtrace Call Frame End:----
+
+[W/stdlib] thread:main exit:127!
+```
+
+通过上述信息便可以定位到栈溢出的线程与代码位置。
 
 ## 验证平台
 

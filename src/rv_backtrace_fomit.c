@@ -193,10 +193,10 @@ static int backtraceFindLROffset(char *LR)
     return offset;
 }
 
-static int riscv_backtraceFromStack(uintptr_t **pSP, char **pPC)
+static int riscv_backtraceFromStack(uint32_t **pSP, char **pPC)
 {
     char *CodeAddr = NULL;
-    uintptr_t  *SP      = *pSP;
+    uint32_t  *SP      = *pSP;
     char *PC       = *pPC;
     char *LR;
     int   i;
@@ -281,7 +281,7 @@ static int riscv_backtraceFromStack(uintptr_t **pSP, char **pPC)
     return offset == 0 ? 1 : 0;
 }
 
-static int backtraceFromStack(uintptr_t **pSP, char **pPC)
+static int backtraceFromStack(uint32_t **pSP, char **pPC)
 {
     if (BT_CHK_PC_AVAIL(*pPC) == 0) {
         return -1;
@@ -311,7 +311,7 @@ __attribute__((always_inline)) static inline void *backtrace_get_pc(void)
 int rvbacktrace_fomit(void)
 {
     char *PC;
-    uintptr_t  *SP;
+    uint32_t  *SP;
     int   ret;
 
     SP = backtrace_get_sp();
@@ -334,9 +334,40 @@ int rvbacktrace_fomit(void)
     BACKTRACE_PRINTF("\r\n");
     return lvl;
 }
-
+void rvbacktrace_info(uint32_t *uSP, uint32_t *uPC)
+{
+    char *PC;
+    uint32_t  *SP;
+    SP = uSP;
+    PC = (char *)uPC;
+    int   ret;    //先保存PC的值，方便addr2line使用
+    rvstack_frame[0] = (unsigned int)(PC);
+    for (lvl = 1; lvl < BT_LVL_LIMIT; lvl++) {
+        ret = backtraceFromStack(&SP, &PC);
+        if (ret != 0) {
+            rvstack_frame_len = lvl;
+            break;
+        }
+    }
+    rvbacktrace_addr2line((uint32_t *)&rvstack_frame[0]); // addr2line function
+}
+#ifdef RT_USING_FINSH
 void rv_backtrace_fomit_func(void)
 {
     rvbacktrace_fomit();
 }
 MSH_CMD_EXPORT_ALIAS(rv_backtrace_fomit_func, rv_backtrace_fomit, backtrace fomit);
+
+void rv_backtrace_hardfault_test(void)
+{
+    uint32_t *PC;
+    uint32_t  *SP;
+    int   ret;
+
+    SP = backtrace_get_sp();
+    PC = backtrace_get_pc();
+
+    rvbacktrace_info(SP, PC);
+}
+MSH_CMD_EXPORT_ALIAS(rv_backtrace_hardfault_test, rv_backtrace_int_test, backtrace fomit);
+#endif

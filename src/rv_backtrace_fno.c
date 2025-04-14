@@ -135,10 +135,14 @@ void rvbacktrace_fno(void)
     BACKTRACE_PRINTF("---- RV_Backtrace Call Frame End:----\r\n");
     BACKTRACE_PRINTF("\r\n");
 }
-
+#ifdef RT_USING_FINSH
 void rv_backtrace_func(void)
 {
     rvbacktrace_fno();
 }
 MSH_CMD_EXPORT_ALIAS(rv_backtrace_func, rv_backtrace_all, backtrace all threads);
+
+
+#endif
+
 #endif /* BACKTRACE_USE_FP */

@@ -154,7 +154,11 @@ static int riscv_backtrace_ra_offset_get(unsigned short inst)
      * default: 0xc006 : 110 000000 00001 10
      *
      *  */
+#if __riscv_xlen == 64
+    if ((inst & 0xE07F) == 0xE006) {
+#else
     if ((inst & 0xE07F) == 0xC006) {
+#endif
         imm = (inst >> 9) & 0x0F; //imm[5:2] 已经偏移最低两位，放大了4倍
         imm = imm | (((inst >> 7) & 0x3)<<4); //imm[7:6]
         /* The unit is size_t, So we don't have to move 3 bits to the left */

@@ -216,7 +216,11 @@ static int backtraceFindLROffset(char *LR)
 static int riscv_backtraceFromStack(uint32_t **pSP, char **pPC)
 {
     char *CodeAddr = NULL;
+#if __riscv_xlen == 64
+    uint64_t  *SP      = *pSP;
+#else
     uint32_t  *SP      = *pSP;
+#endif
     char *PC       = *pPC;
     char *LR;
     int   i;

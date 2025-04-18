@@ -10,16 +10,16 @@
 
 /* Please check that the following symbols are defined in the linked scripts ！*/ 
 /* If not, define the following symbols at the beginning and end of the text segment */
-extern char *__etext;
-extern char *__stext;
+extern char *BACKTRACE_TEXT_END;
+extern char *BACKTRACE_TEXT_START;
 
 extern unsigned int rvstack_frame[STACK_FRAME_LEN]; // stack frame
 extern unsigned int rvstack_frame_len; // stack frame len
 
 static int lvl;
 
-#define BT_CHK_PC_AVAIL(pc)   ((uintptr_t)(pc) < (uintptr_t)(&__etext) \
-                              && (uintptr_t)(pc) > (uintptr_t)(&__stext))
+#define BT_CHK_PC_AVAIL(pc)   ((uintptr_t)(pc) < (uintptr_t)(&BACKTRACE_TEXT_END) \
+                              && (uintptr_t)(pc) > (uintptr_t)(&BACKTRACE_TEXT_START))
 
 #define BT_FUNC_LIMIT   0x2000
 #define BT_LVL_LIMIT    64
@@ -355,7 +355,7 @@ int rvbacktrace_fomit(void)
     BACKTRACE_PRINTF("###Please consider the value of ra as accurate and the value of sp as only for reference###\n");
     BACKTRACE_PRINTF("------------------------------Thread: %s backtrace------------------------------\r\n", ((rt_thread_t)rt_thread_self())->parent.name);
     BACKTRACE_PRINTF("----SP:0x%x----PC:0x%x----\r\n",SP,PC);
-
+    BACKTRACE_PRINTF("----TEXT start :0x%x----end:0x%x----\r\n",&BACKTRACE_TEXT_START,&BACKTRACE_TEXT_END);
     for (lvl = 0; lvl < BT_LVL_LIMIT; lvl++) {
         ret = backtraceFromStack(&SP, &PC);
         if (ret != 0) {

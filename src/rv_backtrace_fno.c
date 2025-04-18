@@ -12,7 +12,7 @@
  */
 
 #include "rvbacktrace.h"
-#if defined(BACKTRACE_USE_FP)
+#ifdef BACKTRACE_USE_FP
 static uint32_t _rt_susrstack;
 static uint32_t _rt_eusrstack;
 static rt_thread_t _backtrace_thread;

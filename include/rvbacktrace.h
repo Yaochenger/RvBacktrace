@@ -12,6 +12,9 @@
 #define BACKTRACE_PRINTF rt_kprintf // Printf function to print stack back information
 #define rv_memcpy   rt_memcpy // Memory copy function 为了支持非对齐访问
 
+#define BACKTRACE_TEXT_START __stext 
+#define BACKTRACE_TEXT_END __etext
+
 /* Backtrace All Threads */
 #if defined(BACKTRACE_USE_FP) && defined(BACKTRACE_ALL)
 #define BACKTRACE_ALL_THREAD

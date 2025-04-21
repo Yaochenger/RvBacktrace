@@ -40,7 +40,7 @@ void rvbacktrace_addr2line(uint32_t *frame)
         if (offset >= STACK_BUFFER_LEN)
             break;
     }
-    BACKTRACE_PRINTF("\naddr2line -e rtthread.elf -a -f %s\n", buffer); 
+    BACKTRACE_PRINTF("\naddr2line -e %s -a -f %s\n", BACKTRACE_ELF_NAME,buffer);
 }
 
 #if defined (BACKTRACE_FSTACK_PROTECT)

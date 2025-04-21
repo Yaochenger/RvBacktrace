@@ -353,7 +353,9 @@ int rvbacktrace_fomit(void)
 
     BACKTRACE_PRINTF("\r\n---- RV_Backtrace Call Frame Start: -SP_size:%x---\r\n",sizeof(SP));
     BACKTRACE_PRINTF("###Please consider the value of ra as accurate and the value of sp as only for reference###\n");
+#ifdef RT_VER_NUM
     BACKTRACE_PRINTF("------------------------------Thread: %s backtrace------------------------------\r\n", ((rt_thread_t)rt_thread_self())->parent.name);
+#endif
     BACKTRACE_PRINTF("----SP:0x%x----PC:0x%x----\r\n",SP,PC);
     BACKTRACE_PRINTF("----TEXT start :0x%x----end:0x%x----\r\n",&BACKTRACE_TEXT_START,&BACKTRACE_TEXT_END);
     for (lvl = 0; lvl < BT_LVL_LIMIT; lvl++) {

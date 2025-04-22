@@ -33,7 +33,7 @@ static int riscv_backtrace_framesize_get1(unsigned int inst)
     /* addi sp, sp, -im
      * example
      * d1010113             addi    sp,sp,-752
-     * from spec addi FROM https://riscv.github.io/riscv-isa-manual/snapshot/unprivileged/  (2.4.1)
+     * from spec addi FROM https://riscv.github.io/riscv-isa-manual/snapshot/unprivileged/#_integer_register_immediate_instructions
      * bit[31:20] = imm[11:0]
      * bit[19:15] = 00010
      * bit[14:12] = 000
@@ -59,7 +59,7 @@ static int riscv_backtrace_framesize_get(unsigned short inst)
     unsigned int imm = 0;
     /* addi sp, sp, -im
      * 1141:addi    sp,sp,-16
-     * from spec c.addi FROM https://riscv.github.io/riscv-isa-manual/snapshot/unprivileged/
+     * from spec c.addi FROM https://riscv.github.io/riscv-isa-manual/snapshot/unprivileged/#_integer_register_immediate_instructions
      * bit[13-15] = 000
      * bit[1:0]  = 01
      * imm[5] = bit[12]   默认负数
@@ -80,7 +80,7 @@ static int riscv_backtrace_framesize_get(unsigned short inst)
     /* c.addi16sp sp, nzuimm6<<4
        * 7101:addi  sp,sp,-512
        * 7119:addi  sp,sp,-128
-       * from spec c.addi16sp FROM https://riscv.github.io/riscv-isa-manual/snapshot/unprivileged/
+       * from spec c.addi16sp FROM https://riscv.github.io/riscv-isa-manual/snapshot/unprivileged/#_integer_constant_generation_instructions
        * bit[12] = imm[9]    默认负数
        * bit[11:7] = 00010   //x2 (ra)
        * bit[6]  = imm[4]
@@ -113,7 +113,7 @@ static int riscv_backtrace_ra_offset_get1(unsigned int inst)
     /*
      * example:
      * 2e112623:sw  ra,748(sp)
-     *from spec sw FROM https://riscv.github.io/riscv-isa-manual/snapshot/unprivileged/
+     *from spec sw FROM https://riscv.github.io/riscv-isa-manual/snapshot/unprivileged/#ldst
      * BIT[31:25] = imm[11:5]
      * BIT[11:7] = imm[4:0]
      * BIT[6:0] - 0100011
@@ -145,7 +145,7 @@ static int riscv_backtrace_ra_offset_get(unsigned short inst)
      * ce06: sw  ra,28(sp)
      * c206: sw  ra,4(sp)
      * c006: sw  ra,0(sp)
-     * from spec c.swsp FROM https://riscv.github.io/riscv-isa-manual/snapshot/unprivileged/
+     * from spec c.swsp FROM https://riscv.github.io/riscv-isa-manual/snapshot/unprivileged/#_stack_pointer_based_loads_and_stores
      * bit[15:13] = 110
      * bit[12:9] = imm[5:2]
      * bit[8:7]  = imm[7:6]
